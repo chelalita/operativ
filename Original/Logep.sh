@@ -1,6 +1,4 @@
-escribirLog(){
-	echo $USER at $DIA $HORA: $RAZON $2 >>  $DIRLOG/$1
-}
+LOG=".log"
 
 DIA=$(date +"%D")
 HORA=$(date +"%H:%M:%S")
@@ -13,16 +11,20 @@ fi
 
 if [ ! $3 ]
 	then 
-	RAZON="-"
+	RAZON="INFO"
 else
 	RAZON=$3
 fi
+echo "$DIA$HORA-$USER-$1-$3-$2" >> $DIRBIN/$1$LOG
 
-escribirLog
+if [ -f $1$LOG ]
+	then
+	LINEAS=`wc -l $DIRLOG/$1`
+else
+	LINEAS=0
+fi
 
-LINEAS=`wc -l $DIRLOG/$1`
-
-if [ LINEAS -gt 10 ]
+if [[ LINEAS -gt 10 ]]
 	then
 	sed '1,5d' $DIRLOG/$1
 	sed -i '$USER at $DIA $HORA: log reducido...' $DIRLOG/$1

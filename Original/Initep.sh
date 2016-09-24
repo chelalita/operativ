@@ -8,7 +8,7 @@ verificarExistenciaConf(){
 	if [ ! -f $ARCHIVO ]
 		then
 		echo "No existe el archivo de configuracion , abortando instalacion..."
-		Logep Initep "No existe el archivo de configuracion , abortando instalacion..." ERR
+		bash $DIRBIN/Logep.sh Initep "No existe el archivo de configuracion , abortando instalacion..." ERR
 		exit
 	fi
 }
@@ -54,14 +54,14 @@ verificarPermisos(){
 
 	echo " Estado del Sistema: INICIALIZADO "
 
-		Logep Initep "Estado del Sistema: INICIALIZADO " INFO
+	bash $DIRBIN/Logep.sh Initep "Estado del Sistema: INICIALIZADO " INFO
 }
 
 function permisoLectura(){
 	if [ ! -f $1 ]
 		then
 		echo "No existe el $1 archivo , por favor reinstale el sitema..."
-		Logep Initep "No existe $1 archivo, por favor reinstal el sistema..." ERR
+		bash $DIRBIN/Logep.sh Initep "No existe $1 archivo, por favor reinstal el sistema..." ERR
 		exit
 	fi
 	
@@ -71,7 +71,7 @@ function permisoLectura(){
 		if [ 1 -r $1 ]
 			then
 			echo "No se pudo asignar permiso de lectura a $1, abortando..."
-			Logep Initep "No se pudo asignar permiso de lectura a $1, abortando..." ERR
+			bash $DIRBIN/Logep.sh Initep "No se pudo asignar permiso de lectura a $1, abortando..." ERR
 			exit
 		fi
 	fi
@@ -81,7 +81,7 @@ permisoEjecucion(){
 		if [ ! -f $1 ]
 		then
 		echo "No existe el $1 archivo , por favor reinstale el sitema..."
-		Logep Initep "No existe el $1 archivo, por favor reinstale el sistema..." ERR
+		bash $DIRBIN/Logep.sh Initep "No existe el $1 archivo, por favor reinstale el sistema..." ERR
 		exit
 	fi
 	if [ ! -r $1 ] || [ ! -w $1 ] || [ ! -x $1 ]
@@ -90,7 +90,7 @@ permisoEjecucion(){
 		if [ 1 -r $1 ]
 			then
 			echo "No se pudieron asignar permisos a $1 , abortando..."
-			Logep Initep "No exixste el $1 archivo, por favor reinstale el sistema..." ERR
+			bash $DIRBIN/Logep.sh Initep "No exixste el $1 archivo, por favor reinstale el sistema..." ERR
 			exit
 		fi
 	fi
@@ -100,20 +100,20 @@ verificarDemCorriendo(){
 	if [ -f "$DIRBIN/ejecucion" ]
 		then
 		echo " el demonio se esta ejecutando"
-		LOGEP Initep "El demonio se esta ejecutando" INFO
+		bash $DIRBIN/Logep.sh Initep "El demonio se esta ejecutando" INFO
 	else
 		bash $DIRBIN/Demonep.sh &
 		IDPROC=`ps -aef | grep "$BINDIR/Demonep.sh" | awk 'NR==1 {print $2}' `
 		echo "Demonep corriendo bajo el no.: $IDPROC"
-		Logep Initep "Demonep corriendo bajo el no.: $IDPROC"
+		bash $DIRBIN/Logep.sh Initep "Demonep corriendo bajo el no.: $IDPROC"
 	fi
 }
 
 explicacionManual(){
 	echo "Para inicializar el Deamonep ejecute $BINDIR/Deamonep.sh &"
-	Logep Initep "Para inicializar el Deamonep ejecute $BINDIR/Deamonep.sh &" INFO
-	Logep Initep "Para terminar la ejecucion utilice el comando >kill <idprocess>" INFO
-	echo" Para terminar la ejecucion utilice el comando >kill <idprocess>"
+	bash $DIRBIN/Logep.sh Initep "Para inicializar el Deamonep ejecute $BINDIR/Deamonep.sh &" INFO
+	bash $DIRBIN/Logep.sh Initep "Para terminar la ejecucion utilice el comando >kill <idprocess>" INFO
+	 echo " Para terminar la ejecucion utilice el comando >kill <idprocess>"
 }
 
 
@@ -122,7 +122,7 @@ explicacionManual(){
 if [[ SETEADO = 1 ]]
 	then
 	echo "Ambiente ya inicializado, para reiniciar termine la sesion e ingrese nuevamente"
-	Logep Initep "Ambiente ya inicializado, para reiniciar termine la sesion e ingrese nuevamente" INFO
+	bash $DIRBIN/Logep.sh Initep "Ambiente ya inicializado, para reiniciar termine la sesion e ingrese nuevamente" INFO
 	exit
 fi
 inicializarVariables
@@ -130,9 +130,9 @@ setearVariables
 verificarPermisos
 
 echo "¿Desea efectuar la activación de Demonep? Si – No "
-Logep Initep "¿Desea efectuar la activación de Demonep? Si – No " INFO
+bash $DIRBIN/Logep.sh Initep "¿Desea efectuar la activación de Demonep? Si – No " INFO
 read rta 
-Logep Initep "La respuesta del usuario fue $rta" INFO
+bash $DIRBIN/Logep.sh Initep "La respuesta del usuario fue $rta" INFO
 if [ $rta = "si " ] || [ $rta = "Si" ]
 	then
 	verificarDemCorriendo
