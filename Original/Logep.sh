@@ -15,7 +15,7 @@ if [ ! $3 ]
 else
 	RAZON=$3
 fi
-echo "$DIA$HORA-$USER-$1-$3-$2" >> $DIRBIN/$1$LOG
+echo "$DIA$HORA-$USER-$1-$3-$2" >> $DIRLOG/$1$LOG
 
 if [ -f $1$LOG ]
 	then
