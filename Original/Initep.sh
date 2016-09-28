@@ -154,8 +154,10 @@ function demonio {
 
 	while :
 	do
-		echo "¿Desea efectuar la activación de RecPro? Si – No"
+		echo "¿Desea efectuar la activación de Demonep? Si – No"
+		bash $DIRBIN/Logep.sh Initep "¿Desea efectuar la activación de Demonep? Si – No " INFO
 		read DECISION
+		bash $DIRBIN/Logep.sh Initep "La respuesta del usuario fue $rta" INFO
 		case "$DECISION" in
 			Si | SI | sI | si )
 				verificarDemCorriendo
@@ -166,7 +168,8 @@ function demonio {
 				break
 				;;
 			*)
-				echo "Usage: {SI|NO}"
+				echo "ERROR: Introduzca si o no"
+				bash $DIRBIN/Logep.sh Initep "Ingreso comando no valido " ERR
 				;;
 		esac
 	done
