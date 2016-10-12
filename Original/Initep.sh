@@ -9,8 +9,7 @@ verificarExistenciaConf(){
 
 
 inicializarVariables(){
-	GRUPO="/home/juancho/FIUBA/SistemasOperativos/TP"
-	#GRUPO= ` grep '^GRUPO' "$ARCHIVO" | cut -f2 -d=`
+	GRUPO=` grep '^GRUPO' "$ARCHIVO" | cut -f2 -d=`
 	DIRBIN=` grep '^DIRBIN' "$ARCHIVO" | cut -f2 -d= `
 	DIRMAE=` grep '^DIRMAE' "$ARCHIVO" | cut -f2 -d= `
 	DIRREC=` grep '^DIRREC' "$ARCHIVO" | cut -f2 -d= `
@@ -55,6 +54,12 @@ verificarPermisos(){
            then
                 return 1
         fi
+
+    permisoLectura "$DIRMAE/actividades.csv"
+    if [ $1 = "1" ]
+    	then
+    		return 1
+    fi
 
 	permisoEjecucion "$DIRBIN/Demonep.sh"
 	if [ "$?" = "1" ]
@@ -131,7 +136,7 @@ permisoEjecucion(){
 }
 
 verificarDemCorriendo(){
-	if [ -f "$DIRBIN/ejecucion" ]
+	if [ -f "$DIRBIN/.ejecucion" ]
 		then
 		echo " el demonio se esta ejecutando"
 		bash $DIRBIN/Logep.sh Initep "El demonio se esta ejecutando" INFO
@@ -139,7 +144,10 @@ verificarDemCorriendo(){
 		bash $DIRBIN/Demonep.sh &
 		IDPROC=`ps -aef | grep "$BINDIR/Demonep.sh" | awk 'NR==1 {print $2}' `
 		echo "Demonep corriendo bajo el no.: $IDPROC"
-		bash $DIRBIN/Logep.sh Initep "Demonep corriendo bajo el no.: $IDPROC"
+		bash $DIRBIN/Logep.sh Initep "Demonep corriendo bajo el no.: $IDPROC" INFO
+		echo " Para terminar la ejecucion utilice el comando >kill <idprocess>"
+		bash $DIRBIN/Logep.sh Initep " Para terminar la ejecucion utilice el comando >kill <idprocess>"
+		
 	fi
 }
 
@@ -206,7 +214,6 @@ verificarPermisos
 SETEADO=1
 demonio
 
+
 cd ../bin
-
-
 rm -f *.tmp

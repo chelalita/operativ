@@ -64,19 +64,26 @@ then
 	exit
 fi
 
+if [ -f "$DIRBIN/.ejecutado" ]
+		then
+		bash $DIRBIN/Logep.sh Demonep "El demonio se esta ejecutando" ERR
+		exit
+fi
+
+touch $DIRBIN/.ejecutado
+IDPROC=`ps -aef | grep "$BINDIR/Demonep.sh" | awk 'NR==1 {print $2}' `
+bash $DIRBIN/Logep.sh Demonep "Demonep corriendo bajo el no.: $IDPROC" INFO
+
 while [ true ]
 do
 	CANT_CICLOS=$(expr $CANT_CICLOS + 1)
 	bash $DIRBIN/Logep.sh Demonep "Ciclo numero $CANT_CICLOS " INFO
 	ARCHIVOS=$(ls $DIRREC | wc -l)
-	if [ $ARCHIVOS = 0 ]
+	if [  $ARCHIVOS != 0 ]
 	then
-		echo "No hay archivos nuevos"
-		exit
-		else
-		echo "Hay archivos nuevos"
 		ProcesarArchivos $DIRREC
-		exit
 	fi
+	sleep 5
+
 done
 exit 0

@@ -201,6 +201,7 @@ echo 'Instalando Archivos Maestros y Tablas' | tee -a $PWD/dirconfig/Instalep.lo
 cp $GRUPO/Original/centros.csv $GRUPO/$DIRMAE
 cp $GRUPO/Original/provincias.csv $GRUPO/$DIRMAE
 cp $GRUPO/Original/trimestres.csv $GRUPO/$DIRMAE
+cp $GRUPO/Original/actividades.csv $GRUPO/$DIRMAE
 }
 
 function verificarEspacio(){
