@@ -45,16 +45,62 @@ function Procesar_un_Archivo() {
 
 	IFS='_'
 	read ejecutado anio_pres cod_prov fecha<<< "$nombre"		
-	
+	IFS="$aux"
 	#Valido que el formato sea el correcto.
 	if [ -z $ejecutado ] || [ -z $anio_pres ] || [ -z $cod_prov ] || [ -z "$fecha" ]
 	then
-		IFS="$aux"
+		bash $DIRBIN/Logep.sh Demonep "Archivo rechazado,motivo: formato de nombre incorrecto" WAR
 		bash $DIRBIN/Movep.sh "$direccionCompleta" "$DIRNOK" "DEMONEP"
 		return 1
 	fi
-
-
+	#valido que sea el formato correcto
+	if [ 'ejecutado' != $ejecutado ]
+	then
+		bash $DIRBIN/Logep.sh Demonep "Archivo rechazado,motivo: formato de nombre incorrecto" WAR
+		bash $DIRBIN/Movep.sh "$direccionCompleta" "$DIRNOK" "DEMONEP"
+		return 1
+	fi
+	#valido anio presupuestario
+	if [ $(date +"%Y") != $anio_pres ]
+	then
+		bash $DIRBIN/Logep.sh Demonep "Archivo rechazado,motivo: año $anio_pres incorrecto" WAR
+		bash $DIRBIN/Movep.sh "$direccionCompleta" "$DIRNOK" "DEMONEP"
+		return 1
+	fi
+	#valido codigo de prov
+	val_cod_prov=` grep "^$cod_prov;" "$DIRMAE/provincias.csv" `
+	IFS=";"
+	read cod basura1 basura2 <<< "$val_cod_prov"
+	IFS="$aux"
+	if [ -z $val_cod_prov ]
+	then
+		bash $DIRBIN/Logep.sh Demonep "Archivo rechazado,motivo: provincia $cod_prov incorrecto" WAR
+		bash $DIRBIN/Movep.sh "$direccionCompleta" "$DIRNOK" "DEMONEP"
+		return 1
+	fi
+	#valido fecha
+	anio=`expr substr $fecha 1 4`
+	mes=`expr substr $fecha 5 2`
+	dia=`expr substr $fecha 7 2`
+	val_anio=`echo $anio | grep ^[0-2][0][1][5-6]$`
+	val_mes=`echo $mes | grep ^[0-1][0-9]$`
+	val_dia=`echo $dia | grep ^[0-3][0-9]$`
+	if [ -z $val_anio ] || [ -z $val_mes ] || [ -z $val_dia ]
+	then
+		bash $DIRBIN/Logep.sh Demonep "Archivo rechazado,motivo: fecha $fecha invalida" WAR
+		bash $DIRBIN/Movep.sh "$direccionCompleta" "$DIRNOK" "DEMONEP"
+		return 1
+	fi
+	#valido rango de fecha
+	echo "$anio$mes$dia jaja"
+	if [ "$anio$mes$dia" \< "20151212" ] || [ "$anio$mes$dia" \> $(date +"%Y%m%d") ]
+	then
+		bash $DIRBIN/Logep.sh Demonep "Archivo rechazado,motivo: fecha $fecha invalida" WAR
+		bash $DIRBIN/Movep.sh "$direccionCompleta" "$DIRNOK" "DEMONEP"
+		return 1
+	fi
+	bash $DIRBIN/Logep.sh Demonep "Archivo aceptado" INFO
+	bash $DIRBIN/Movep.sh "$direccionCompleta" "$DIROK" "DEMONEP"
 }
 #**********MAin***********
 CANT_CICLOS=0
