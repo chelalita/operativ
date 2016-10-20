@@ -1,7 +1,4 @@
 
-$DIRMAE=mae;
-$DIRINFO=rep;
-$DIRPROC=imp;
 sub mostrarBienvenida{
 	print "<><><><><><><Bienvenido a Listep><><><><><><>"."\n".
 	   "Inserte (1,2,3 o h) seguido de un enter para:"."\n".
@@ -21,20 +18,29 @@ sub mostrarInstruccionesEjecutado{
 			" inserte un 0 y luego presione enter nuevamente, de no haberse insertado ningun nombre se"."\n".
 			" listaran todas las actividades ejecutadas para el anio presupuestario corriente."."\n";
 }
+sub mostrarInstruccionesControlEjecutado{
+	print "Inserte los numeros de los trimestres (1,2,3 o 4) que desea listar seguidos de un enter."."\n".
+			" Para finalizar inserte un 0 y luego presione enter nuevamente, de no haberse insertado"."\n".
+			" ningun numero se listaran todos los trimestres ejecutados para el anio presupuestario"."\n".
+			" corriente."."\n";
+}
+sub mostrarInstruccionesControlEjecutadoCentros{
+	print "Inserte los codigos de los centros que desea listar seguidos de un enter. Para finalizar"."\n".
+			" inserte un 0 y luego presione enter nuevamente, de no haberse insertado ningun codigo"."\n".
+			" se listaran todos los centros ejecutados para el anio presupuestario corriente."."\n".
+			" Si desea listar un rango de centros, inserte el inicio de los codigos seguido de un *."."\n";
+}
 sub mostrarGrabacion{
 	print "Desea grabar el informe a un archivo? (s/n):";
 }
 sub grabarArchivo{
 	my ($nombre, @file) = @_;
 	my $contador = 0;
-#	while (-f "$ENV{DIRINFO}/informe_$nombre"."_"."$contador.csv"){
-#		$contador++;
-#	}
-#	open (INFORME , ">"."$ENV{DIRINFO}/informe_$nombre"."_"."$contador.csv");
-	while (-f "$DIRINFO/informe_$nombre"."_"."$contador.csv"){
+	while (-f "$ENV{DIRINFO}/informe_$nombre"."_"."$contador.csv"){
 		$contador++;
 	}
-	open (INFORME , ">"."$DIRINFO/informe_$nombre"."_"."$contador.csv");
+	open (INFORME , ">"."$ENV{DIRINFO}/informe_$nombre"."_"."$contador.csv");
+	
 	foreach $linea (@file){
 		print INFORME $linea;
 	}
@@ -60,8 +66,7 @@ sub terminarListado{
 }
 sub obtenerNombreCentro{
 	my $codCentro = $_[0];
-#	open(CENTROS, "<$ENV{DIRMAE}/centros.csv") or die "No se encontro el archivo centros.csv";	
-	open(CENTROS, "<$DIRMAE/centros.csv") or die "No se encontro el archivo centros.csv";	
+	open(CENTROS, "<$ENV{DIRMAE}/centros.csv") or die "No se encontro el archivo centros.csv";	
 	my @registros = <CENTROS>;
 	my	$encontrado = 0;
 	my $i = 0;
@@ -92,6 +97,9 @@ sub mostrarRegistro{
 	my $imprSep = $_[2];
 	if($imprSep){
 		print "----------------------------------------";
+		for(my $i = 0; $i < $cantCol; $i++){
+		print "-";
+		}
 		print "----------------------------------------\n";
 	}
 	my $espacioCol = 80/$cantCol;
@@ -119,7 +127,7 @@ sub mostrarRegistro{
 		}
 		print $valor;
 		$escritos += length($valor);
-		for(; $escritos < $espacioCol*$contador; $escritos++){
+		for(; $escritos < $espacioCol*$contador + $contador - 1; $escritos++){
 			print " ";
 		}
 		print "|";
@@ -134,8 +142,7 @@ sub mostrarRegistro{
 }
 sub existeActividad {
 	my $nomAct = @_[0];
-#	open(ACTIVIDADES,"<$ENV{DIRMAE}/actividades.csv") or die "No se pudo abrir el archivo actividades.csv";
-	open(ACTIVIDADES,"<$DIRMAE/actividades.csv") or die "No se pudo abrir el archivo actividades.csv";
+	open(ACTIVIDADES,"<$ENV{DIRMAE}/actividades.csv") or die "No se pudo abrir el archivo actividades.csv";
 	my @registros = <ACTIVIDADES>;
 	my	$encontrado = 0;
 	my $i = 0; 
@@ -150,8 +157,7 @@ sub existeActividad {
 	$encontrado;
 }
 sub listarPrepSancionadoCt{
-	#	open(SANCIONADO, "<$ENV{DIRMAE}/sancionado-$ANIO_PRESUPUESTARIO.csv") or die "No se encontro el archivo de sanciones";
-	open(SANCIONADO, "<$DIRMAE/sancionado-$ANIO_PRESUPUESTARIO.csv") or die "No se encontro el archivo de sanciones";
+	open(SANCIONADO, "<$ENV{DIRMAE}/sancionado-$ANIO_PRESUPUESTARIO.csv") or die "No se encontro el archivo de sanciones";
 	my @registros = <SANCIONADO>;
 	my %sanciones;
 	my @centros;
@@ -204,8 +210,7 @@ sub listarPrepSancionadoCt{
 	terminarListado("sancionadoct",@file);
 }
 sub listarPrepSancionadoTc{
-#	open(my SANCIONADO, "$ENV{DIRMAE}/sancionado-$ANIO_PRESUPUESTARIO.csv");
-	open(SANCIONADO, "<$DIRMAE/sancionado-$ANIO_PRESUPUESTARIO.csv") or die "No se encontro el archivo de sanciones";
+	open(SANCIONADO, "$ENV{DIRMAE}/sancionado-$ANIO_PRESUPUESTARIO.csv") or die "No se encontro el archivo de sanciones";
 	my @registros = <SANCIONADO>;
 	my %sanciones;
 	my @centros;
@@ -258,7 +263,7 @@ sub listarPrepSancionadoTc{
 	close(SANCIONADO);
 	terminarListado("sancionadotc",@file);
 }
-sub listarPrepSancionado{
+	sub listarPrepSancionado{
 	system(clear);
 	mostrarOpcionesSancionado;
 	my $decision = <STDIN>;
@@ -274,6 +279,22 @@ sub listarPrepSancionado{
 	if($decision eq "tc"){
 		listarPrepSancionadoTc;
 	}
+}
+
+sub controlarGasto{
+	my $act = @_[0];
+	my $centro = @_[1];
+	open(TABLA,"<$ENV{DIRMAE}/tabla-AxC.csv") or die "No se pudo abrir el archivo tabla-AxC.csv";
+	my @regsTabla = <TABLA>;
+	shift(@regsTabla);
+	foreach my $registro (@regsTabla){
+		chomp($registro);
+		my ($actAux, $centroAux) = split(";",$registro);
+		if ($actAux eq $act && $centroAux eq $centro){
+			return(" ");
+		}
+	}
+	return("gasto fuera de la planificacion");
 }
 sub listarPrepEjecutado{
 	system(clear);
@@ -292,9 +313,9 @@ sub listarPrepEjecutado{
 		$actFiltro = <STDIN>;
 		chomp($actFiltro);
 	}
+	#si no inserto ningun filtro lo lleno con todas las actividades
 	if (scalar(keys(%filtrosAct)) == 0){
-		#	open(ACTIVIDADES,"<$ENV{DIRMAE}/actividades.csv") or die "No se pudo abrir el archivo actividades.csv";
-		open(ACTIVIDADES,"<$DIRMAE/actividades.csv") or die "No se pudo abrir el archivo actividades.csv";
+		open(ACTIVIDADES,"<$ENV{DIRMAE}/actividades.csv") or die "No se pudo abrir el archivo actividades.csv";
 		my @registros = <ACTIVIDADES>;
 		shift(@registros);
 		foreach my $registro (@registros){
@@ -306,8 +327,7 @@ sub listarPrepEjecutado{
 	}
 	#asumo que el archivo de centros tiene los centros ordenados
 	my @centros;
-#	open(CENTROS,"<$ENV{DIRMAE}/centros.csv") or die "No se pudo abrir el archivo centros.csv";
-	open(CENTROS,"<$DIRMAE/centros.csv") or die "No se pudo abrir el archivo centros.csv";
+	open(CENTROS,"<$ENV{DIRMAE}/centros.csv") or die "No se pudo abrir el archivo centros.csv";
 	my @registros = <CENTROS>;
 	shift(@registros);
 	foreach my $registro (@registros){
@@ -317,55 +337,227 @@ sub listarPrepEjecutado{
 	}
 	close(CENTROS);
 	
-	my %centrosXFechas;
-	my %fechaCenActTriXGasto;
-#	open(EJECUTADOS,"<$ENV{DIRPROC}/aceptados_$ANIO_PRESUPUESTARIO.csv") or die "No se pudo abrir el 
-#																								archivo aceptados_$ANIO_PRESUPUESTARIO.csv";
-	open(EJECUTADOS,"<$DIRPROC/aceptados_$ANIO_PRESUPUESTARIO.csv") or die "No se pudo abrir el 
-																								archivo aceptados_$ANIO_PRESUPUESTARIO.csv";
+	my %fechas;
+	my %registrosListado;
+	open(EJECUTADOS,"<$ENV{DIRPROC}/aceptado_$ANIO_PRESUPUESTARIO.csv") or die "No se pudo abrir el archivo aceptado_$ANIO_PRESUPUESTARIO.csv";
 	my @registros = <EJECUTADOS>;
 	shift(@registros);
 	foreach my $registro (@registros){
 		chomp($registro);
-		my ($id, $fecha, $codCentro, $nomAct, $trim, $gasto) = split(";",$registro);
-		if (exists($filtrosAct{$nomAct})){
-			my $nomProv = (split(";",$registro))[8];
-			if(! exists($centrosXFechas{$codCentro})){
-				my @fechas = ($fecha);
-				$centrosXFechas{$codCentro} = \@fechas;
+		my ($id, $fecha, $codCentro, $nomAct, $trim, $gasto, $archOrigen, $codAct, $nomProv, $nomCentro) = split(";",$registro);
+		if (exists($filtrosAct{"$nomAct"})){
+			$fechas{$fecha} = 1;
+			my $key = "$fecha/$codCentro/$nomAct";
+			my $control = controlarGasto($codAct,$codCentro);
+			my $regAux = crearRegistro($fecha, $nomCentro, $nomAct, $trim, $gasto, $nomProv, $control);
+			if(! exists($registrosListado{"$key"})){
+				my @arrayRegs = ("$regAux");
+				$registrosListado{"$key"} = \@arrayRegs;
 			}else{
-				push($centrosXFechas{$codCentro}, $fecha);
+				push($registrosListado{"$key"}, "$regAux");
 			}
-			my $newKey = "$fecha/$codCentro/$nomAct/$trim/$nomProv";
-			if(! exists($fechaCenActTriXGasto{$newKey})){
-				$fechaCenActTriXGasto{$newKey} = $gasto;
-			}else{
-				$fechaCenActTriXGasto{$newKey} += $gasto;
-			}
-	
 		}
 	}
 	close(EJECUTADOS);
-	
-	my @trimestres = ("Primer Trimestre $ANIO_PRESUPUESTARIO", "Segundo Trimestre $ANIO_PRESUPUESTARIO", 
-							"Tercer Trimestre $ANIO_PRESUPUESTARIO", "Cuarto Trimestre $ANIO_PRESUPUESTARIO");
 	my @file;
 	my $header = crearRegistro("Fecha","Nom cen","Actividad","Trimestre","Gasto","Prov","Control");
 	push(@file,"$header\n");
 	mostrarRegistro($header, 7, 1);
 	foreach my $actividad (keys(%filtrosAct)){
+		my $gastoTotalAct = 0;
 		foreach my $centro (@centros){
-			my @fechasOrd = sort($centrosXFechas{$centro});
-			my $nombreCentro = obtenerNombreCentro{$centro};
+			my @fechasOrd = sort(keys(%fechas));
 			foreach my $fechaReg (@fechasOrd){
-				my $registroFecha = crearRegistro($fechaReg,$nombreCentro,$actividad,
+				my $key = "$fechaReg/$centro/$actividad";
+				if (exists($registrosListado{"$key"})){
+					my $registrosFecha = $registrosListado{"$key"};
+					foreach my $reg (@$registrosFecha){
+						$gastoTotalAct += (split(";",$reg))[4];
+						push(@file,"$reg\n");
+						mostrarRegistro($reg, 7, 1);
+					}
+				}
+				
 			}
+		}
+		if ($gastoTotalAct != 0){
+			my $footerAct = crearRegistro(" ", " ", " ", "Total $actividad", $gastoTotalAct, " ", " ");
+			push(@file,"$footerAct\n");
+			mostrarRegistro($footerAct, 7, 1);
+		}
+	}
+	terminarListado("presupuesto_ejecutado",@file);
+}
+sub listarControlPrepEjecutado{
+	system(clear);
+	mostrarInstruccionesControlEjecutado;
+	my $trimFiltro = <STDIN>;
+	chomp($trimFiltro);
+	my %filtrosTrim;
+	my @nomTrim = ("Primer Trimestre $ANIO_PRESUPUESTARIO","Segundo Trimestre $ANIO_PRESUPUESTARIO","Tercer Trimestre $ANIO_PRESUPUESTARIO","Cuarto Trimestre $ANIO_PRESUPUESTARIO");
+	while($trimFiltro ne "0"){
+		if(! exists($filtrosTrim{$nomTrim[$trimFiltro-1]}) ){
+			if($trimFiltro == 1 || $trimFiltro == 2 || $trimFiltro == 3 || $trimFiltro == 4){
+				$filtrosTrim{$nomTrim[$trimFiltro-1]} = 1;
+			}else{
+				print "El filtro no fue insertado, trimestre invalido\n";
+			}
+		}
+		$trimFiltro = <STDIN>;
+		chomp($trimFiltro);
+	}
+	
+	#si no inserto ningun filtro lo lleno con todos los trimestres
+	if (scalar(keys(%filtrosTrim)) == 0){
+		for(my $i = 0; $i < 4; $i++){
+			$filtrosTrim{$nomTrim[$i]} = 1;
 		}
 	}
 
-}
-sub listarControlPrepEjecutado{
-	print "control de presupuesto ejecutado!!!";
+	mostrarInstruccionesControlEjecutadoCentros;
+	open(CENTROS, "<$ENV{DIRMAE}/centros.csv") or die "No se encontro el archivo centros.csv";	
+	my @registros = <CENTROS>;
+	shift(@registros);
+	my $centroFiltro = <STDIN>;
+	chomp($centroFiltro);
+	my %filtrosCentro;
+	$centroFiltro =~ s/\*/\.\*/;
+	while($centroFiltro ne "0"){
+		for(my $i = 0; $i <= $#registros; $i++){
+			chomp($registros[$i]);
+			if ($registros[$i] =~ "^$centroFiltro;"){
+				$cod_centro = (split(";",$registros[$i]))[0];
+				$filtrosCentro{$cod_centro} = 1;
+			}
+		}
+		$centroFiltro = <STDIN>;
+		chomp($centroFiltro);
+		$centroFiltro =~ s/\*/\.\*/;
+	}
+	
+	#si no inserto ningun codigo lo lleno con todos los codigos
+	if (scalar(keys(%filtrosCentro)) == 0){
+		foreach my $registro (@registros){
+			chomp($registro);
+			my $cod_centro = (split(";",$registro))[0];
+			$filtrosCentro{$cod_centro} = 1;
+		}
+	}
+	close(CENTROS);
+
+	open(SANCIONADO, "$ENV{DIRMAE}/sancionado-$ANIO_PRESUPUESTARIO.csv") or die "No se encontro el archivo de sanciones";
+	my @registros = <SANCIONADO>;
+	my %sanciones;
+	my @centros;
+	for(my $i=1;$i<=$#registros;$i++){
+		my $registro = $registros[$i];
+		chomp($registro);
+		my ($centro,$trimestre,$f11,$f22) = split(";",$registro);
+		$f11 =~ s/,/./;
+		$f22 =~ s/,/./;
+		my $sancionado = $f11 + $f22;
+
+		if(!exists($sanciones{"$centro"})){
+			my @gastos = ($sancionado);
+			$sanciones{"$centro"} = \@gastos;
+			push(@centros,$centro);
+		}else{
+			push($sanciones{"$centro"},$sancionado);
+		}
+	}
+	close(SANCIONADO);
+
+	my %fechas;
+	my %registrosListado;
+	open(EJECUTADOS,"<$ENV{DIRPROC}/aceptado_$ANIO_PRESUPUESTARIO.csv") or die "No se pudo abrir el archivo aceptado_$ANIO_PRESUPUESTARIO.csv";
+	my @registros = <EJECUTADOS>;
+	shift(@registros);
+	foreach my $registro (@registros){
+		chomp($registro);
+		my ($id, $fecha, $codCentro, $nomAct, $trim, $gasto, $archOrigen, $codAct) = split(";",$registro);
+		if (exists($filtrosCentro{"$codCentro"}) && exists($filtrosTrim{$trim})){
+			$fechas{$fecha} = 1;
+			my $key = "$fecha/$codCentro/$nomAct/$trim";
+			my $control = controlarGasto($codAct,$codCentro);
+			my $regAux = crearRegistro($fecha, $codCentro, $nomAct, $trim, $gasto, $control);
+			if(! exists($registrosListado{"$key"})){
+				my @arrayRegs = ("$regAux");
+				$registrosListado{"$key"} = \@arrayRegs;
+			}else{
+				push($registrosListado{"$key"}, "$regAux");
+			}
+		}
+	}
+	close(EJECUTADOS);
+	
+	my @actividades;
+	open(ACTIVIDADES,"<$ENV{DIRMAE}/actividades.csv") or die "No se pudo abrir el archivo actividades.csv";
+	my @registros = <ACTIVIDADES>;
+	shift(@registros);
+	foreach my $registro (@registros){
+		chomp($registro);
+		my $nombreAct = (split(";",$registro))[3];
+		push(@actividades, $nombreAct);
+	}
+	close(ACTIVIDADES);
+	
+	my %iniciosTrimestres;
+	open(TRIMESTRES,"<$ENV{DIRMAE}/trimestres.csv") or die "No se pudo abrir el archivo trimestres.csv";
+	my @registros = <TRIMESTRES>;
+	shift(@registros);
+	my $i = 0;
+	foreach my $registro (@registros){
+		chomp($registro);
+		if($registro =~ "$nomTrim[$i]"){
+			my $fechaIniTrim = (split(";",$registro))[2];
+			my ($dia, $mes, $anio) = split("/",$fechaIniTrim);
+			$fechaIniTrim = "$anio$mes$dia";
+			$iniciosTrimestres{$nomTrim[$i]} = $fechaIniTrim;
+		}	
+		$i++;
+	}
+	close(ACTIVIDADES);
+
+	my %nomTrim = ("Primer Trimestre $ANIO_PRESUPUESTARIO",1,"Segundo Trimestre $ANIO_PRESUPUESTARIO",2,"Tercer Trimestre $ANIO_PRESUPUESTARIO",3,"Cuarto Trimestre $ANIO_PRESUPUESTARIO",4);
+
+	my @file;
+	my $header = crearRegistro("Fecha", "Centro", "Actividad", "Trimestre", "Importe", "Saldo por trimestre", "Control", "Saldo acumulado");
+	push(@file,"$header\n");
+	mostrarRegistro($header,8,1);
+	foreach my $cod_centro (keys(%filtrosCentro)){
+		my $importeAcum = 0;
+		foreach my $trimestre (@nomTrim){
+			if(exists($filtrosTrim{$trimestre})){
+				my $importe = $sanciones{$cod_centro}[$numTrim{$trimestre}];
+				$importeAcum += $importe;
+				my $headerTrim = crearRegistro( $iniciosTrimestres{$trimestre} , $cod_centro, 0, $trimestre, $importe, $importe, " ", $importeAcum);
+				push(@file,"$headerTrim\n");
+				mostrarRegistro($headerTrim,8,1);
+				foreach my $actividad (@actividades){
+					my @fechasOrd = sort(keys(%fechas));
+					foreach my $fechaReg (@fechasOrd){
+						my $key = "$fechaReg/$cod_centro/$actividad/$trimestre";
+						if (exists($registrosListado{"$key"})){
+							my $registrosFecha = $registrosListado{"$key"};
+							foreach my $reg (@$registrosFecha){
+								my $regGasto = (split(";",$reg))[4];
+								my $regControl = (split(";",$reg))[5];
+								$importe -= $regGasto;
+								$importeAcum -= $regGasto;
+								if($importe < 0){
+									$regControl .= "presupuesto excedido";
+								}
+								my $regFinal = crearRegistro($fechaReg, $cod_centro, $actividad, $trimestre,"-$regGasto",$importe,$regControl, $importeAcum);
+								push(@file,"$regFinal\n");
+								mostrarRegistro($regFinal, 8, 1);
+							}
+						}	
+					}
+				}
+			}			
+		}
+	}
+	terminarListado("control_presupuesto_ejecutado",@file);
 }
 sub mostrarAyuda{
 	print "ayuda!!!";
